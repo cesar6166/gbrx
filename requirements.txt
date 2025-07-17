@@ -4,3 +4,5 @@ openpyxl
 bcrypt
 requests
 python-dotenv
+win32com
+pythoncom
