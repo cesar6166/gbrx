@@ -6,6 +6,7 @@ import sqlite3
 import platform
 import urllib.parse
 import csv  # Para detectar delimitadores
+import streamlit.components.v1 as components
 
 def obtener_usuario_desde_db():
     try:
@@ -39,14 +40,11 @@ def Entregas():
             if archivo.name.endswith((".xlsx", ".xls")):
                 df = pd.read_excel(archivo)
             elif archivo.name.endswith((".csv", ".txt")):
-                # Leer una muestra para detectar el delimitador
                 sample = archivo.read(2048).decode("utf-8")
-                archivo.seek(0)  # Regresar al inicio del archivo
-
+                archivo.seek(0)
                 sniffer = csv.Sniffer()
                 dialect = sniffer.sniff(sample)
                 delimiter_detectado = dialect.delimiter
-
                 df = pd.read_csv(archivo, delimiter=delimiter_detectado)
                 st.info(f"Delimitador detectado: '{delimiter_detectado}'")
             else:
@@ -57,37 +55,42 @@ def Entregas():
             st.dataframe(df)
 
             nombre_usuario = obtener_usuario_desde_db()
-
             asunto = f"MRO INFORME {datetime.now().strftime('%Y-%m-%d')}"
             cuerpo = f"Se adjunta el informe MRO.\n\nEnviado por: {nombre_usuario}"
             mailto_link = f"mailto:avisosgbrx@outlook.com?subject={urllib.parse.quote(asunto)}&body={urllib.parse.quote(cuerpo)}"
-            st.markdown(f"📧 Abrir correo en tu celular", unsafe_allow_html=True)
 
-            if st.button("Abrir Outlook con archivo adjunto"):
-                try:
-                    if platform.system() == "Windows":
-                        import pythoncom
-                        import win32com.client
+            # Selección del entorno
+            modo_envio = st.radio("¿Desde dónde estás usando esta app?", ["PC con Outlook", "Celular o sin Outlook"])
 
-                        pythoncom.CoInitialize()
+            if modo_envio == "Celular o sin Outlook":
+                st.markdown(f"[📧 Abrir correo en tu celular, unsafe_allow_html=True)
 
-                        with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
-                            tmp.write(archivo.getbuffer())
-                            temp_path = tmp.name
+            elif modo_envio == "PC con Outlook":
+                if st.button("Abrir Outlook con archivo adjunto"):
+                    try:
+                        if platform.system() == "Windows":
+                            import pythoncom
+                            import win32com.client
 
-                        outlook = win32com.client.Dispatch("Outlook.Application")
-                        mail = outlook.CreateItem(0)
-                        mail.To = "avisosgbrx@outlook.com"
-                        mail.Subject = asunto
-                        mail.Body = cuerpo
-                        mail.Attachments.Add(temp_path)
-                        mail.Display()
+                            pythoncom.CoInitialize()
 
-                        st.success("Outlook se abrió con el correo preparado.")
-                    else:
-                        st.warning("Estás en un entorno que no soporta Outlook local. Usa el enlace de arriba para enviar el correo desde tu celular.")
-                except Exception as e:
-                    st.error(f"No se pudo preparar el correo: {e}")
+                            with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
+                                tmp.write(archivo.getbuffer())
+                                temp_path = tmp.name
+
+                            outlook = win32com.client.Dispatch("Outlook.Application")
+                            mail = outlook.CreateItem(0)
+                            mail.To = "avisosgbrx@outlook.com"
+                            mail.Subject = asunto
+                            mail.Body = cuerpo
+                            mail.Attachments.Add(temp_path)
+                            mail.Display()
+
+                            st.success("Outlook se abrió con el correo preparado.")
+                        else:
+                            st.warning("Estás en un entorno que no soporta Outlook local. Usa el enlace de arriba para enviar el correo desde tu celular.")
+                    except Exception as e:
+                        st.error(f"No se pudo preparar el correo: {e}")
 
         except Exception as e:
             st.error(f"Error al leer el archivo: {e}")
