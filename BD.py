@@ -2,8 +2,12 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 import tempfile
-import win32com.client
-import pythoncom
+import platform  # 👈 Importar para detectar el sistema operativo
+
+# Solo importar si estás en Windows
+if platform.system() == "Windows":
+    import pythoncom
+    import win32com.client
 
 def base_de_datos():
     if st.button("Regresar"):
@@ -11,6 +15,4 @@ def base_de_datos():
         st.rerun()
 
     st.title("Gestión de la Base de Datos")
-    st.text("Aqui ira la base de datos de todos los items")
-
-    
+    st.text("Aquí irá la base de datos de todos los ítems")
