@@ -3,7 +3,8 @@ import pandas as pd
 from datetime import datetime
 import tempfile
 import sqlite3
-import platform  # 👈 Importar para detectar el sistema operativo
+import platform
+import urllib.parse  # 👈 Necesario para codificar el enlace mailto
 
 def obtener_usuario_desde_db():
     try:
@@ -40,6 +41,12 @@ def Entregas():
 
             nombre_usuario = obtener_usuario_desde_db()
 
+            # 👉 NUEVO: Enlace mailto para abrir correo desde el celular
+            asunto = f"MRO INFORME {datetime.now().strftime('%Y-%m-%d')}"
+            cuerpo = f"Se adjunta el informe MRO en formato Excel.\n\nEnviado por: {nombre_usuario}"
+            mailto_link = f"mailto:avisosgbrx@outlook.com?subject={urllib.parse.quote(asunto)}&body={urllib.parse.quote(cuerpo)}"
+            st.markdown(f"📧 Abrir correo en tu celular", unsafe_allow_html=True)
+
             if st.button("Abrir Outlook con archivo adjunto"):
                 try:
                     if platform.system() == "Windows":
@@ -55,14 +62,14 @@ def Entregas():
                         outlook = win32com.client.Dispatch("Outlook.Application")
                         mail = outlook.CreateItem(0)
                         mail.To = "avisosgbrx@outlook.com"
-                        mail.Subject = f"MRO INFORME {datetime.now().strftime('%Y-%m-%d')}"
-                        mail.Body = f"Se adjunta el informe MRO en formato Excel.\n\nEnviado por: {nombre_usuario}"
+                        mail.Subject = asunto
+                        mail.Body = cuerpo
                         mail.Attachments.Add(temp_path)
                         mail.Display()
 
                         st.success("Outlook se abrió con el correo preparado.")
                     else:
-                        st.warning("Estás en un entorno que no soporta Outlook local. Aquí deberías usar Microsoft Graph API o SMTP.")
+                        st.warning("Estás en un entorno que no soporta Outlook local. Usa el enlace de arriba para enviar el correo desde tu celular.")
                 except Exception as e:
                     st.error(f"No se pudo preparar el correo: {e}")
 
