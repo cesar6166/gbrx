@@ -4,7 +4,8 @@ from datetime import datetime
 import tempfile
 import sqlite3
 import platform
-import urllib.parse  # Para codificar el enlace mailto
+import urllib.parse
+import csv  # Para detectar delimitadores
 
 def obtener_usuario_desde_db():
     try:
@@ -31,19 +32,34 @@ def Entregas():
 
     st.text("Página de entregas. Por favor, genera los cierres, anéxalos y da clic en el botón.")
 
-    archivo = st.file_uploader("Cargar archivo Excel", type=["xlsx", "xls"])
+    archivo = st.file_uploader("Cargar archivo", type=["xlsx", "xls", "csv", "txt"])
 
     if archivo is not None:
         try:
-            df = pd.read_excel(archivo)
+            if archivo.name.endswith((".xlsx", ".xls")):
+                df = pd.read_excel(archivo)
+            elif archivo.name.endswith((".csv", ".txt")):
+                # Leer una muestra para detectar el delimitador
+                sample = archivo.read(2048).decode("utf-8")
+                archivo.seek(0)  # Regresar al inicio del archivo
+
+                sniffer = csv.Sniffer()
+                dialect = sniffer.sniff(sample)
+                delimiter_detectado = dialect.delimiter
+
+                df = pd.read_csv(archivo, delimiter=delimiter_detectado)
+                st.info(f"Delimitador detectado: '{delimiter_detectado}'")
+            else:
+                st.error("Formato de archivo no soportado.")
+                return
+
             st.success("Archivo cargado correctamente.")
             st.dataframe(df)
 
             nombre_usuario = obtener_usuario_desde_db()
 
-            # Enlace mailto para abrir correo desde el celular
             asunto = f"MRO INFORME {datetime.now().strftime('%Y-%m-%d')}"
-            cuerpo = f"Se adjunta el informe MRO en formato Excel.\n\nEnviado por: {nombre_usuario}"
+            cuerpo = f"Se adjunta el informe MRO.\n\nEnviado por: {nombre_usuario}"
             mailto_link = f"mailto:avisosgbrx@outlook.com?subject={urllib.parse.quote(asunto)}&body={urllib.parse.quote(cuerpo)}"
             st.markdown(f"📧 Abrir correo en tu celular", unsafe_allow_html=True)
 
