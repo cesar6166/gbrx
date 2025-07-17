@@ -3,7 +3,6 @@ import pandas as pd
 from datetime import datetime
 import tempfile
 import sqlite3
-import platform
 import urllib.parse
 import csv
 import io
