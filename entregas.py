@@ -63,8 +63,7 @@ def Entregas():
             modo_envio = st.radio("¿Desde dónde estás usando esta app?", ["PC con Outlook", "Celular o sin Outlook"])
 
             if modo_envio == "Celular o sin Outlook":
-                st.markdown(f"[📧 Abrir correo en tu celular", unsafe_allow_html=True)
-
+                st.markdown(f"📧 Abrir correo en tu celular", unsafe_allow_html=True)
 
             elif modo_envio == "PC con Outlook":
                 if st.button("Abrir Outlook con archivo adjunto"):
