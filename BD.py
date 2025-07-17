@@ -14,5 +14,11 @@ def base_de_datos():
         st.session_state.pagina = "ProgramaEjemplo"
         st.rerun()
 
-    st.title("Gestión de la Base de Datos")
+    # Encabezado
+    col1, col2 = st.columns([1, 5])
+    with col1:
+        st.title("Gestión de la Base de Datos")
+    with col2:
+        st.image("GREENBRIERLOGO.png", width=100)
+    
     st.text("Aquí irá la base de datos de todos los ítems")
