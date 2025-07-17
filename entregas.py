@@ -3,15 +3,7 @@ import pandas as pd
 from datetime import datetime
 import tempfile
 import sqlite3
-import platform
-
-# Mostrar sistema operativo detectado
-st.write("Sistema operativo detectado:", platform.system())
-
-# Solo importar si estás en Windows
-if platform.system() == "Windows":
-    import pythoncom
-    import win32com.client
+import platform  # 👈 Importar para detectar el sistema operativo
 
 def obtener_usuario_desde_db():
     try:
@@ -51,6 +43,9 @@ def Entregas():
             if st.button("Abrir Outlook con archivo adjunto"):
                 try:
                     if platform.system() == "Windows":
+                        import pythoncom
+                        import win32com.client
+
                         pythoncom.CoInitialize()
 
                         with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
