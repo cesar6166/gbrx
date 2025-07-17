@@ -5,8 +5,8 @@ import tempfile
 import sqlite3
 import platform
 import urllib.parse
-import csv  # Para detectar delimitadores
-import streamlit.components.v1 as components
+import csv
+import io
 
 def obtener_usuario_desde_db():
     try:
@@ -24,7 +24,6 @@ def Entregas():
         st.session_state.pagina = "ProgramaEjemplo"
         st.rerun()
 
-    # Encabezado
     col1, col2 = st.columns([1, 5])
     with col1:
         st.title("Entregas")
@@ -38,7 +37,7 @@ def Entregas():
     if archivo is not None:
         try:
             if archivo.name.endswith((".xlsx", ".xls")):
-                df = pd.read_excel(archivo)
+                df = pd.read_excel(archivo, engine="openpyxl" if archivo.name.endswith(".xlsx") else "xlrd")
             elif archivo.name.endswith((".csv", ".txt")):
                 sample = archivo.read(2048).decode("utf-8")
                 archivo.seek(0)
@@ -59,38 +58,21 @@ def Entregas():
             cuerpo = f"Se adjunta el informe MRO.\n\nEnviado por: {nombre_usuario}"
             mailto_link = f"mailto:avisosgbrx@outlook.com?subject={urllib.parse.quote(asunto)}&body={urllib.parse.quote(cuerpo)}"
 
-            # Selección del entorno
-            modo_envio = st.radio("¿Desde dónde estás usando esta app?", ["PC con Outlook", "Celular o sin Outlook"])
+            modo_envio = st.radio("¿Desde dónde estás usando esta app?", ["PC o celular"])
 
-            if modo_envio == "Celular o sin Outlook":
-                st.markdown(f"📧 Abrir correo en tu celular", unsafe_allow_html=True)
+            # Guardar archivo como Excel para descarga
+            output = io.BytesIO()
+            df.to_excel(output, index=False, engine='openpyxl')
+            output.seek(0)
 
-            elif modo_envio == "PC con Outlook":
-                if st.button("Abrir Outlook con archivo adjunto"):
-                    try:
-                        if platform.system() == "Windows":
-                            import pythoncom
-                            import win32com.client
+            st.download_button(
+                label="📥 Descargar archivo Excel",
+                data=output,
+                file_name=f"MRO_{datetime.now().strftime('%Y%m%d')}.xlsx",
+                mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
 
-                            pythoncom.CoInitialize()
-
-                            with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
-                                tmp.write(archivo.getbuffer())
-                                temp_path = tmp.name
-
-                            outlook = win32com.client.Dispatch("Outlook.Application")
-                            mail = outlook.CreateItem(0)
-                            mail.To = "avisosgbrx@outlook.com"
-                            mail.Subject = asunto
-                            mail.Body = cuerpo
-                            mail.Attachments.Add(temp_path)
-                            mail.Display()
-
-                            st.success("Outlook se abrió con el correo preparado.")
-                        else:
-                            st.warning("Estás en un entorno que no soporta Outlook local. Usa el enlace de arriba para enviar el correo desde tu celular.")
-                    except Exception as e:
-                        st.error(f"No se pudo preparar el correo: {e}")
+            st.markdown(f"📧 Abrir correo para enviar informe", unsafe_allow_html=True)
 
         except Exception as e:
             st.error(f"Error al leer el archivo: {e}")
