@@ -7,7 +7,6 @@ import platform
 import urllib.parse
 import csv  # Para detectar delimitadores
 import streamlit.components.v1 as components
-import entregas
 
 def obtener_usuario_desde_db():
     try:
