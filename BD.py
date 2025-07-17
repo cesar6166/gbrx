@@ -17,7 +17,7 @@ def base_de_datos():
     # Encabezado
     col1, col2 = st.columns([1, 5])
     with col1:
-        st.title("Gestión de la Base de Datos")
+        st.title("Catalagos")
     with col2:
         st.image("GREENBRIERLOGO.png", width=100)
     
