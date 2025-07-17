@@ -4,7 +4,7 @@ from datetime import datetime
 import tempfile
 import sqlite3
 import platform
-import urllib.parse  # 👈 Necesario para codificar el enlace mailto
+import urllib.parse  # Para codificar el enlace mailto
 
 def obtener_usuario_desde_db():
     try:
@@ -41,7 +41,7 @@ def Entregas():
 
             nombre_usuario = obtener_usuario_desde_db()
 
-            # 👉 NUEVO: Enlace mailto para abrir correo desde el celular
+            # Enlace mailto para abrir correo desde el celular
             asunto = f"MRO INFORME {datetime.now().strftime('%Y-%m-%d')}"
             cuerpo = f"Se adjunta el informe MRO en formato Excel.\n\nEnviado por: {nombre_usuario}"
             mailto_link = f"mailto:avisosgbrx@outlook.com?subject={urllib.parse.quote(asunto)}&body={urllib.parse.quote(cuerpo)}"
