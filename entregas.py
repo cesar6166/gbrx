@@ -26,7 +26,7 @@ def obtener_usuario_desde_db():
 def Entregas():
     # Mostrar advertencia si no es Windows
     if platform.system() != "Windows":
-        st.warning("⚠️ Esta sección es exclusiva para uso desde una PC. Algunas funciones no estan disponibles para celulares.")
+        st.warning("⚠️ Esta sección es exclusiva para uso desde una PC con Windows. Algunas funciones como el envío de correos no están disponibles en este dispositivo.")
 
     if st.button("Regresar"):
         st.session_state.pagina = "ProgramaEjemplo"
@@ -41,11 +41,21 @@ def Entregas():
 
     st.text("Página de entregas. Por favor, genera los cierres, anéxalos y da clic en el botón.")
 
-    archivo = st.file_uploader("Cargar archivo Excel", type=["xlsx", "xls"])
+    archivo = st.file_uploader("Cargar archivo", type=["xlsx", "xls", "csv", "txt"])
 
     if archivo is not None:
         try:
-            df = pd.read_excel(archivo)
+            # Leer archivo según su tipo
+            if archivo.name.endswith((".xlsx", ".xls")):
+                df = pd.read_excel(archivo)
+            elif archivo.name.endswith(".csv"):
+                df = pd.read_csv(archivo)
+            elif archivo.name.endswith(".txt"):
+                df = pd.read_csv(archivo, delimiter="\t", engine="python")
+            else:
+                st.error("Formato de archivo no soportado.")
+                return
+
             st.success("Archivo cargado correctamente.")
             st.dataframe(df)
 
@@ -53,7 +63,7 @@ def Entregas():
 
             if st.button("Enviar correo con archivo adjunto"):
                 try:
-                    with tempfile.NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
+                    with tempfile.NamedTemporaryFile(delete=False, suffix="." + archivo.name.split(".")[-1]) as tmp:
                         tmp.write(archivo.getbuffer())
                         temp_path = tmp.name
 
@@ -63,12 +73,12 @@ def Entregas():
                         mail = outlook.CreateItem(0)
                         mail.To = "avisosgbrx@outlook.com"
                         mail.Subject = f"MRO INFORME {datetime.now().strftime('%Y-%m-%d')}"
-                        mail.Body = f"Se adjunta el informe MRO en formato Excel.\n\nEnviado por: {nombre_usuario}"
+                        mail.Body = f"Se adjunta el informe MRO.\n\nEnviado por: {nombre_usuario}"
                         mail.Attachments.Add(temp_path)
                         mail.Display()
                         st.success("Outlook se abrió con el correo preparado.")
                     else:
-                        st.warning("No disponible")
+                        st.warning("Estás en un entorno que no soporta Outlook local. Aquí deberías usar Microsoft Graph API o SMTP.")
                         # Aquí puedes integrar Microsoft Graph API o SMTP
                         # Puedo ayudarte a implementarlo si ya tienes las credenciales
 
