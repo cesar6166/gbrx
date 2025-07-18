@@ -45,25 +45,30 @@ def Entregas():
 
     if archivo is not None:
         try:
-            # Leer archivo según su tipo
-            if archivo.name.endswith((".xlsx", ".xls")):
+            extension = archivo.name.split(".")[-1].lower()
+
+            if extension in ["xlsx", "xls"]:
                 df = pd.read_excel(archivo)
-            elif archivo.name.endswith(".csv"):
+                mostrar_df = True
+            elif extension == "csv":
                 df = pd.read_csv(archivo)
-            elif archivo.name.endswith(".txt"):
-                df = pd.read_csv(archivo, delimiter="\t", engine="python")
+                mostrar_df = True
+            elif extension == "txt":
+                mostrar_df = False  # No mostrar contenido
             else:
                 st.error("Formato de archivo no soportado.")
                 return
 
             st.success("Archivo cargado correctamente.")
-            st.dataframe(df)
+
+            if extension != "txt":
+                st.dataframe(df)
 
             nombre_usuario = obtener_usuario_desde_db()
 
             if st.button("Enviar correo con archivo adjunto"):
                 try:
-                    with tempfile.NamedTemporaryFile(delete=False, suffix="." + archivo.name.split(".")[-1]) as tmp:
+                    with tempfile.NamedTemporaryFile(delete=False, suffix="." + extension) as tmp:
                         tmp.write(archivo.getbuffer())
                         temp_path = tmp.name
 
@@ -78,10 +83,7 @@ def Entregas():
                         mail.Display()
                         st.success("Outlook se abrió con el correo preparado.")
                     else:
-                        st.warning("Estás desde el telefono, porfavor lee el mensaje de advertencia aneterior.")
-                        # Aquí puedes integrar Microsoft Graph API o SMTP
-                        # Puedo ayudarte a implementarlo si ya tienes las credenciales
-
+                        st.warning("Por favor lee el mensaje de advertencia anterior.")
                 except Exception as e:
                     st.error(f"No se pudo preparar el correo: {e}")
 
