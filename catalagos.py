@@ -14,7 +14,15 @@ def items():
         st.session_state.pagina = "ProgramaEjemplo"
         st.rerun()
 
-    st.title("Catálogos")
+    #Encabezado
+    col1, col2 = st.columns([1, 5])
+
+    with col1:
+        st.title("Catalagos")
+        
+    with col2:
+        st.image("LOGO.jpeg", width=100)
+        
     st.text("Hola, en este apartado puedes consultar los catálogos de MRO.")
 
     st.subheader("Selecciona la ubicación del almacén")
