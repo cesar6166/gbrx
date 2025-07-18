@@ -15,8 +15,8 @@ def mostrar():
     if st.session_state.get("autenticado", False):
         st.success(f"¡Bienvenido, {st.session_state.usuario}!")
 
-    if st.button("Items"):
-        st.session_state.pagina = "BD"
+    if st.button("Catalagos"):
+        st.session_state.pagina = "catalagos"
         st.rerun()
     
     if st.button("Entregas"):
