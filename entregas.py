@@ -26,7 +26,7 @@ def obtener_usuario_desde_db():
 def Entregas():
     # Mostrar advertencia si no es Windows
     if platform.system() != "Windows":
-        st.warning("⚠️ Esta sección es exclusiva para uso desde una PC con Windows. Algunas funciones como el envío de correos no están disponibles en este dispositivo.")
+        st.warning("⚠️ Esta sección es exclusiva para uso desde una PC. Algunas funciones no estan disponibles para celulares.")
 
     if st.button("Regresar"):
         st.session_state.pagina = "ProgramaEjemplo"
@@ -68,7 +68,7 @@ def Entregas():
                         mail.Display()
                         st.success("Outlook se abrió con el correo preparado.")
                     else:
-                        st.warning("Estás en un entorno que no soporta Outlook local. Aquí deberías usar Microsoft Graph API o SMTP.")
+                        st.warning("No disponible")
                         # Aquí puedes integrar Microsoft Graph API o SMTP
                         # Puedo ayudarte a implementarlo si ya tienes las credenciales
 
