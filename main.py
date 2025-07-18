@@ -2,7 +2,7 @@
 import streamlit as st
 import Login
 import ProgramaEjemplo
-import BD
+import catalagos
 import entregas
 
 # Configurar la página
@@ -24,8 +24,8 @@ def main():
         Login.mostrar()
     elif st.session_state.pagina == "ProgramaEjemplo":
         ProgramaEjemplo.mostrar()
-    elif st.session_state.pagina == "BD":
-        BD.base_de_datos()
+    elif st.session_state.pagina == "catalagos":
+        catalagos.items()
     elif st.session_state.pagina == "entregas":
         entregas.Entregas()
 
