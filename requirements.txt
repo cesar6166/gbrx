@@ -4,3 +4,4 @@ openpyxl
 bcrypt
 requests
 python-dotenv
+streamlit-js-eval
