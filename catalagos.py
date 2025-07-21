@@ -9,7 +9,7 @@ if platform.system() == "Windows":
     import win32com.client
 
 def items():
-    if st.button("Regresar"):
+    if st.button("🔙 Regresar"):
         st.session_state.pagina = "ProgramaEjemplo"
         st.rerun()
 
@@ -20,7 +20,7 @@ def items():
     with col2:
         st.image("LOGO.jpeg", width=100)
 
-    st.text("Hola, en este apartado puedes consultar los catálogos de MRO.")
+    st.text("Hola, en este apartado puedes consultar los items de MRO.")
     st.subheader("Buscar por ID o palabra clave")
 
     # Diccionario de catálogos
