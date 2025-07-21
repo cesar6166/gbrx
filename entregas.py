@@ -26,7 +26,7 @@ def obtener_usuario_desde_db():
 def Entregas():
     # Mostrar advertencia si no es Windows
     if platform.system() != "Windows":
-        st.warning("⚠️ Esta sección es exclusiva para uso desde una PC. Algunas funciones no están disponibles en este dispositivos moviles.")
+        st.warning("⚠️ Esta sección es exclusiva para PC. Algunas funciones no están disponibles en dispositivos móviles.")
 
     if st.button("Regresar"):
         st.session_state.pagina = "ProgramaEjemplo"
@@ -39,9 +39,9 @@ def Entregas():
     with col2:
         st.image("GREENBRIERLOGO.png", width=100)
 
-    st.text("Página de entregas. Por favor, genera los cierres, anéxalos y da clic en el botón.")
+    st.text("Página de entregas. Por favor, genera los cierres, anéxalos y haz clic en el botón.")
 
-    archivo = st.file_uploader("Cargar archivo", type=["xlsx", "xls", "csv", "txt"])
+    archivo = st.file_uploader("Cargar archivo", type=["xlsx", "xls", "csv"])
 
     if archivo is not None:
         try:
@@ -53,15 +53,13 @@ def Entregas():
             elif extension == "csv":
                 df = pd.read_csv(archivo)
                 mostrar_df = True
-            elif extension == "txt":
-                mostrar_df = False  # No mostrar contenido
             else:
                 st.error("Formato de archivo no soportado.")
                 return
 
             st.success("Archivo cargado correctamente.")
 
-            if extension != "txt":
+            if mostrar_df:
                 st.dataframe(df)
 
             nombre_usuario = obtener_usuario_desde_db()
@@ -83,7 +81,7 @@ def Entregas():
                         mail.Display()
                         st.success("Outlook se abrió con el correo preparado.")
                     else:
-                        st.warning("Por favor lee el mensaje de advertencia anterior.")
+                        st.warning("Por favor, lee el mensaje de advertencia anterior.")
                 except Exception as e:
                     st.error(f"No se pudo preparar el correo: {e}")
 
