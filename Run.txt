@@ -1,0 +1,8 @@
+Para correr el programa necesitas ingresar este codigo en cmd:
+Debes ejecutarlo en la carpeta donde este ubicado el programa
+
+streamlit run NombreDelPrograma.py
+
+cuenta de avisos
+avisosgbrx@outlook.com
+gbrx2025

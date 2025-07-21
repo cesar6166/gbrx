@@ -1,8 +1,7 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime
-import platform 
 import os
+import platform
 
 # Solo importar si estás en Windows
 if platform.system() == "Windows":
@@ -14,49 +13,50 @@ def items():
         st.session_state.pagina = "ProgramaEjemplo"
         st.rerun()
 
-    #Encabezado
+    # Encabezado
     col1, col2 = st.columns([1, 5])
-
     with col1:
-        st.title("Catalagos")
-        
+        st.title("Catálogos")
     with col2:
         st.image("LOGO.jpeg", width=100)
-        
+
     st.text("Hola, en este apartado puedes consultar los catálogos de MRO.")
+    st.subheader("Buscar por ID o palabra clave")
 
-    st.subheader("Selecciona la ubicación del almacén")
+    # Diccionario de catálogos
+    catalogos = {
+        "MRO GRAL": "Catalogo de Ubi Mro GRAL JULIO 25.xlsx",
+        "MRO GRAL ATRAS": "Catalogo bodega gral parte de atras..xlsx",
+        "MRO GRAL SEGUNDO PISO": "Catalogo segundo piso..xlsx"
+    }
 
-    # Inicializar variable para el DataFrame
-    df_catalogo = None
+    # Campo de búsqueda único
+    filtro_id = st.text_input("🔍 Buscar por ID del ítem o palabra clave:")
 
-    # Checkbox para MRO GRAL
-    if st.checkbox("MRO GRAL"):
-        nombre_archivo = "Catalogo de Ubi Mro GRAL JULIO 25.xlsx"
-        ruta_archivo = os.path.join(os.getcwd(), nombre_archivo)
+    # Buscar en todos los catálogos
+    if filtro_id:
+        encontrado = False
+        for nombre_visible, nombre_archivo in catalogos.items():
+            ruta_archivo = os.path.join(os.getcwd(), nombre_archivo)
 
-        if os.path.exists(ruta_archivo):
-            try:
-                df_catalogo = pd.read_excel(ruta_archivo)
-                st.success(f"Catálogo '{nombre_archivo}' cargado correctamente.")
-            except Exception as e:
-                st.error("No se pudo abrir el catálogo.")
-                st.exception(e)
-        else:
-            st.error(f"No se encontró el archivo: {nombre_archivo}")
+            if os.path.exists(ruta_archivo):
+                try:
+                    df_catalogo = pd.read_excel(ruta_archivo)
+                    df_filtrado = df_catalogo[df_catalogo.astype(str).apply(
+                        lambda row: row.str.contains(filtro_id, case=False, na=False)
+                    ).any(axis=1)]
 
-    # Si el catálogo fue cargado, mostrar campo de búsqueda
-    if df_catalogo is not None:
-        filtro_id = st.text_input("🔍 Buscar por ID del ítem o palabra clave:")
+                    if not df_filtrado.empty:
+                        st.success(f"Resultado encontrado en: {nombre_visible}")
+                        st.dataframe(df_filtrado)
+                        encontrado = True
+                        break  # Detener búsqueda al encontrar el primero
 
-        if filtro_id:
-            df_filtrado = df_catalogo[df_catalogo.astype(str).apply(
-                lambda row: row.str.contains(filtro_id, case=False, na=False)
-            ).any(axis=1)]
-
-            if not df_filtrado.empty:
-                st.dataframe(df_filtrado)
+                except Exception as e:
+                    st.error(f"No se pudo abrir el catálogo: {nombre_archivo}")
+                    st.exception(e)
             else:
-                st.warning("No se encontraron resultados con ese valor.")
-        else:
-            st.dataframe(df_catalogo)
+                st.error(f"No se encontró el archivo: {nombre_archivo}")
+
+        if not encontrado:
+            st.warning("No se encontraron resultados en ningún catálogo.")
