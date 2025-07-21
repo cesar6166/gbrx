@@ -35,7 +35,8 @@ def items():
 
     # Buscar en todos los catálogos
     if filtro_id:
-        encontrado = False
+        resultados_encontrados = False
+
         for nombre_visible, nombre_archivo in catalogos.items():
             ruta_archivo = os.path.join(os.getcwd(), nombre_archivo)
 
@@ -47,10 +48,9 @@ def items():
                     ).any(axis=1)]
 
                     if not df_filtrado.empty:
-                        st.success(f"Resultado encontrado en: {nombre_visible}")
+                        st.markdown(f"### 📁 Resultados en: **{nombre_visible}**")
                         st.dataframe(df_filtrado)
-                        encontrado = True
-                        break  # Detener búsqueda al encontrar el primero
+                        resultados_encontrados = True
 
                 except Exception as e:
                     st.error(f"No se pudo abrir el catálogo: {nombre_archivo}")
@@ -58,5 +58,5 @@ def items():
             else:
                 st.error(f"No se encontró el archivo: {nombre_archivo}")
 
-        if not encontrado:
+        if not resultados_encontrados:
             st.warning("No se encontraron resultados en ningún catálogo.")
