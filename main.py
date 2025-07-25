@@ -4,6 +4,7 @@ import Login
 import ProgramaEjemplo
 import catalagos
 import entregas
+import InventarioDisponible
 
 # Obtener el ancho de la ventana
 window_width = streamlit_js_eval(js_expressions="window.innerWidth", key="WIDTH")
@@ -39,6 +40,8 @@ def main():
         catalagos.items()
     elif st.session_state.pagina == "entregas":
         entregas.Entregas()
+    elif st.session_state.pagina == "InventarioDisponible":
+        InventarioDisponible.mostrar()
 
 if __name__ == "__main__":
     main()

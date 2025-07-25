@@ -23,6 +23,11 @@ def mostrar():
         st.session_state.pagina = "entregas"
         st.rerun()
 
+    if st.button("Inventario Disponible"):
+        st.session_state.pagina = "InventarioDisponible"
+        st.rerun()
+
+
     if st.button("Cerrar sesión"):
         st.session_state.autenticado = False
         st.session_state.usuario = ""
